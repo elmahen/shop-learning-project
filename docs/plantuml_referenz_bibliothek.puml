@@ -1,0 +1,140 @@
+@startuml Library_ER_Reference
+
+' ──────────────────────────────────────────
+' Referenzbeispiel: Bibliothek
+' Zeigt alle wichtigen UML-Konstrukte
+' für E/R Klassendiagramme
+'
+' Konstrukte:
+'  + public   # protected   - private
+'  Assoziation, Aggregation, Komposition
+'  Vererbung, Interface, Enum
+'  Kardinalitäten, Notizen
+' ──────────────────────────────────────────
+
+' === ENUM ===
+enum LoanStatus {
+  ACTIVE
+  RETURNED
+  OVERDUE
+}
+
+enum MembershipType {
+  STANDARD
+  PREMIUM
+  STUDENT
+}
+
+' === INTERFACE ===
+interface Auditable {
+  + getCreatedAt() : LocalDateTime
+  + getUpdatedAt() : LocalDateTime
+}
+
+' === ABSTRAKTE KLASSE ===
+abstract class BaseEntity {
+  # id        : Long
+  # createdAt : LocalDateTime
+  # updatedAt : LocalDateTime
+  + getId() : Long
+}
+
+' === KONKRETE KLASSEN ===
+class Member {
+  - firstName      : String
+  - lastName       : String
+  - email          : String
+  - membershipType : MembershipType
+  + getFullName()  : String
+  + isEligible()   : boolean
+}
+
+class Book {
+  - title         : String
+  - isbn          : String
+  - yearPublished : int
+}
+
+class Author {
+  - firstName : String
+  - lastName  : String
+}
+
+class Loan {
+  - loanDate   : LocalDate
+  - dueDate    : LocalDate
+  - returnDate : LocalDate
+  - status     : LoanStatus
+  + isOverdue()     : boolean
+  + calculateFine() : BigDecimal
+}
+
+class Fine {
+  - amount   : BigDecimal
+  - issuedAt : LocalDateTime
+  - paidAt   : LocalDateTime
+  + isPaid() : boolean
+}
+
+class Reservation {
+  - reservedAt : LocalDateTime
+  - expiresAt  : LocalDateTime
+}
+
+' === VERERBUNG (is-a) ===
+BaseEntity  <|-- Member
+BaseEntity  <|-- Book
+BaseEntity  <|-- Author
+BaseEntity  <|-- Loan
+BaseEntity  <|-- Fine
+BaseEntity  <|-- Reservation
+
+' === INTERFACE IMPLEMENTIERUNG ===
+Auditable   <|.. BaseEntity
+
+' === KOMPOSITION (starke Abhängigkeit, lifecycle) ===
+' Loan existiert nicht ohne Member
+Member      "1"    *--  "0..*"  Loan        : has >
+
+' Fine existiert nicht ohne Loan
+Loan        "1"    *--  "0..1"  Fine        : generates >
+
+' === AGGREGATION (schwächere Abhängigkeit) ===
+' Reservation gehört zum Member, aber Book bleibt unabhängig
+Member      "1"    o--  "0..*"  Reservation : makes >
+
+' === ASSOZIATION ===
+Loan        "0..*" --   "1"     Book        : borrows >
+
+' m:n Beziehung
+Book        "0..*" --   "1..*"  Author      : written by >
+
+' Reservation referenziert Book
+Reservation "0..*" --   "1"     Book        : reserves >
+
+' === ENUM VERWENDUNG ===
+Loan        ..>  LoanStatus     : uses
+Member      ..>  MembershipType : uses
+
+' === NOTIZEN ===
+note right of Fine
+  Mahngebühr wird pro Übertragstag
+  berechnet. Betrag abhängig von
+  MembershipType des Members.
+end note
+
+note bottom of Member
+  UNIQUE constraint auf email.
+  PREMIUM-Mitglieder haben längere
+  Leihfristen und keine Mahngebühren
+  in den ersten 3 Tagen.
+end note
+
+note right of Loan
+  Status-Übergänge:
+  ACTIVE --> RETURNED
+  ACTIVE --> OVERDUE
+  OVERDUE --> RETURNED
+end note
+
+@enduml

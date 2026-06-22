@@ -1,0 +1,21 @@
+{
+  "editor.formatOnSave": true,
+  "editor.tabSize": 4,
+  "java.compile.nullAnalysis.mode": "automatic",
+  "plantuml.diagramsRoot": "docs",
+  "plantuml.exportOutDir": "docs/diagrams",
+  "plantuml.exportFormat": "png",
+  "plantuml.server": "https://www.plantuml.com/plantuml",
+  "[javascript]": {
+    "editor.tabSize": 2
+  },
+  "[javascriptreact]": {
+    "editor.tabSize": 2
+  },
+  "[html]": {
+    "editor.tabSize": 2
+  },
+  "[css]": {
+    "editor.tabSize": 2
+  }
+}

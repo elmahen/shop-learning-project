@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "jebbs.plantuml",
+    "pivotal.vscode-spring-boot",
+    "vmware.vscode-spring-boot",
+    "vscjava.vscode-java-pack",
+    "vscjava.vscode-spring-initializr",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-azuretools.vscode-docker",
+    "ckolkman.vscode-postgres"
+  ]
+}

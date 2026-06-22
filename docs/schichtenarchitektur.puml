@@ -1,0 +1,125 @@
+@startuml Layer_Architecture
+
+' ──────────────────────────────────────────
+' Schichtenarchitektur: com.example.shop
+' Zeigt erlaubte Abhängigkeiten zwischen
+' den Packages (Pfeile = darf kennen)
+' ──────────────────────────────────────────
+
+skinparam packageStyle rectangle
+skinparam ArrowColor #444444
+skinparam PackageBorderColor #888888
+skinparam PackageBackgroundColor #F8F8F8
+skinparam NoteBackgroundColor #FFFDE7
+skinparam NoteBorderColor #F9A825
+
+' ═══════════════════════════════════════════
+' SCHICHTEN (top → bottom = äussere → innere)
+' ═══════════════════════════════════════════
+
+package "com.example.shop" {
+
+  package "rest" #DDEEFF {
+    component "[controller]" as controller
+    component "[dto]" as dto
+  }
+
+  package "scheduler" #DDEEFF {
+    component "[jobs]" as jobs
+  }
+
+  package "service" #DDFFDD {
+    component "[*Service]" as svc
+  }
+
+  package "repository" #FFF3CD {
+    component "[*Repository]" as repo
+  }
+
+  package "domain" #FFE8E8 {
+    component "[*Entity]" as entity
+  }
+
+  package "exception" #F0F0F0 {
+    component "[*Exception]" as exc
+    component "[@ControllerAdvice]" as advice
+  }
+
+}
+
+' ═══════════════════════════════════════════
+' ERLAUBTE ABHÄNGIGKEITEN
+' ═══════════════════════════════════════════
+
+controller  -->  svc        : ruft auf
+controller  -->  dto        : verwendet
+jobs        -->  svc        : ruft auf
+svc         -->  repo       : ruft auf
+svc         -->  entity     : verwendet
+svc         -->  exc        : wirft
+repo        -->  entity     : liest / schreibt
+advice      -->  exc        : behandelt
+
+' ═══════════════════════════════════════════
+' VERBOTENE ABHÄNGIGKEITEN (explizit)
+' ═══════════════════════════════════════════
+
+controller  -[#FF0000,dashed,thickness=2]->  repo   : ✗ VERBOTEN
+controller  -[#FF0000,dashed,thickness=2]->  entity : ✗ VERBOTEN
+jobs        -[#FF0000,dashed,thickness=2]->  repo   : ✗ VERBOTEN
+
+' ═══════════════════════════════════════════
+' REGELN ALS NOTIZEN
+' ═══════════════════════════════════════════
+
+note top of rest
+  Empfängt HTTP Requests.
+  Gibt nur DTOs zurück –
+  niemals Entitäten.
+end note
+
+note right of scheduler
+  Periodische Jobs via @Scheduled.
+  Kennt nur die Service-Schicht.
+end note
+
+note top of service
+  Gesamte Business-Logik hier.
+  @Transactional wo nötig.
+  Kennt Repository und Domain.
+end note
+
+note right of repository
+  Datenzugriff via Spring Data JDBC.
+  Nur CRUD + eigene Queries.
+  Keine Business-Logik.
+end note
+
+note bottom of domain
+  Plain Java Objects.
+  Keine Abhängigkeiten nach oben.
+  Keine Business-Logik.
+end note
+
+note right of exception
+  Eigene Exception-Klassen.
+  @ControllerAdvice für
+  globale Fehlerbehandlung.
+end note
+
+' ═══════════════════════════════════════════
+' LEGENDE
+' ═══════════════════════════════════════════
+
+legend right
+  |= Farbe |= Schicht |
+  |<#DDEEFF> Blau  | Äussere Schicht (REST / Scheduler) |
+  |<#DDFFDD> Grün  | Service-Schicht |
+  |<#FFF3CD> Gelb  | Datenzugriff |
+  |<#FFE8E8> Rot   | Domain (Kern) |
+  |<#F0F0F0> Grau  | Querschnitt |
+  Pfeile = erlaubte Abhängigkeiten
+  Rote gestrichelte Pfeile = VERBOTEN
+endlegend
+
+@enduml
