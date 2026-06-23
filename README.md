@@ -42,6 +42,16 @@ This is the standard setup during development.
 docker compose -f docker-compose.db.yml up -d
 ```
 
+> **How the database user is created**  
+> PostgreSQL's Docker image automatically creates the database user, password and database on first startup — driven by the environment variables in `docker-compose.db.yml`:
+> ```yaml
+> POSTGRES_DB:       shopdb      # database name
+> POSTGRES_USER:     shop_user   # application user (not a superuser)
+> POSTGRES_PASSWORD: shop_pass   # password
+> ```
+> No manual setup needed. The user is the owner of the database and has full privileges on it.  
+> This is why we do **not** use the default `postgres` superuser for the application.
+
 **2. Load schema and test data**
 ```bash
 ./db/schema.sh
