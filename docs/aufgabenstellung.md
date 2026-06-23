@@ -220,3 +220,44 @@ Die Service-Schicht orchestriert die Business-Logik. Da die Zahlungslogik (FIFO-
 | 8 | REST-Layer, DTOs, Fehlerbehandlung, Testscripts → **Review 4** |
 | 9–10 | React UI Grundgerüst, Kundenliste, Kundendetail |
 | 11–12 | Bestelldetail, Polishing, End-to-End Tests → **Review 5** |
+| 13–14 | Dockerization: Dockerfiles, docker-compose.yml, End-to-End in Containern → **Review 6** |
+
+---
+
+# Iteration 6 – Dockerization
+
+## Concept
+The entire application runs in Docker containers. This iteration teaches how to package and run a multi-tier application in a containerized environment – a fundamental skill in modern software development.
+
+- **Learning goal:** *"I understand how to package each application tier as a Docker container and wire them together with Docker Compose."*
+
+## Tasks
+
+### 6a – Backend Dockerfile
+- Write a `Dockerfile` for the Spring Boot application
+- Use a **multi-stage build**:
+  - Stage 1: Maven build (`maven:3.9-eclipse-temurin-21`)
+  - Stage 2: Lean runtime image (`eclipse-temurin:21-jre-alpine`)
+- Externalize configuration via environment variables (`SPRING_DATASOURCE_URL` etc.)
+
+### 6b – Frontend Dockerfile
+- Write a `Dockerfile` for the React application
+- Use a **multi-stage build**:
+  - Stage 1: Node build (`node:20-alpine`)
+  - Stage 2: nginx to serve static files (`nginx:alpine`)
+- Configure nginx to proxy API calls to the backend
+
+### 6c – docker-compose.yml
+- Compose all three services: `postgres`, `backend`, `frontend`
+- Define correct **startup order** (postgres → backend → frontend) via `depends_on` + `healthcheck`
+- Use a **shared network** for container communication
+- Externalize secrets via `.env` file (not committed to Git)
+
+### 6d – Testing
+- Full application runs with a single command:
+```bash
+docker compose up -d
+```
+- Verify all services start cleanly and communicate correctly
+- Document any environment variables in the README
+

@@ -45,3 +45,8 @@ yarn-error.log*
 
 # ── Docker ──────────────────────────────────
 .docker/
+
+# ── Environment / Secrets ────────────────
+.env
+.env.*
+!.env.example
