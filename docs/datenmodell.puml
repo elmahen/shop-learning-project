@@ -1,0 +1,67 @@
+@startuml Order_ER
+
+enum OrderStatus {
+  PLACED
+  CANCELLED
+}
+
+class Customer{
+    - id : Long
+    - firstName : String
+    - lastName : String
+    - email : String
+    - blocked : Boolean
+}
+
+class Order{
+    - id : Long
+    - status : OrderStatus
+    - orderDate : LocalDateTime
+}
+
+class OrderPosition{
+    - id : Long
+    - quantity : int
+    - price : BigDecimal
+}
+
+class Payment{
+    - id : Long
+    - amount : BigDecimal
+    - date : LocalDateTime
+
+}
+
+class Article{
+    - id : Long
+    - name : String
+    - price : BigDecimal
+}
+
+' === KOMPOSITION (starke Abhängigkeit, lifecycle) ===
+'Bestellung existiert nicht ohne Kunde
+Customer     "1"    *--  "0..*"  Order       : places >
+
+
+' === KOMPOSITION ===
+'Bestellposition existiert nicht ohne Bestellung
+Order     "1"    *--  "0..*"  OrderPosition       : contains >
+
+
+' === AGGREGATION (schwächere Abhängigkeit) ===
+' Artikel gehört zum OrderPosition, aber Artikel bleibt unabhängig
+Article     "1"    o--  "0..*"  OrderPosition : makes >
+
+' === KOMPOSITION (starke Abhängigkeit, lifecycle) ===
+' Zahlung existiert nicht ohne Kunde
+Customer      "1"    *--  "0..*"  Payment        : has >
+
+
+' === ENUM VERWENDUNG ===
+Order        ..>  OrderStatus     : uses
+
+
+note bottom of Customer
+  UNIQUE constraint on email.
+  Customer cannot place new orders if balance is overdue for more than 3 months.
+end note
