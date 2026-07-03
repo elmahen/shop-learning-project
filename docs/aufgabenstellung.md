@@ -46,9 +46,18 @@ Die Zahlungslogik ist bewusst komplex gewählt und ist das fachliche Herzstück 
 - Review des Modells **vor** der SQL-Implementierung
 
 ### 1b – Datenbankinstallation
-- PostgreSQL via **Docker** aufsetzen (`docker-compose.yml`)
-- Eigenen Applikations-Schema-User einrichten (kein Superuser)
-- Verbindung verifizieren
+- PostgreSQL via **Docker** aufsetzen (`docker-compose.db.yml`)
+- Verbindung verifizieren via `./db/psql.sh`
+
+> **Hinweis: Applikations-User**  
+> Das Docker-Image erstellt beim ersten Start automatisch den Datenbankuser, das Passwort und die Datenbank – gesteuert durch die Umgebungsvariablen in `docker-compose.db.yml`:
+> ```yaml
+> POSTGRES_DB:       shopdb      # Datenbankname
+> POSTGRES_USER:     shop_user   # Applikationsuser (kein Superuser)
+> POSTGRES_PASSWORD: shop_pass   # Passwort
+> ```
+> Kein manuelles Setup nötig. Der User ist Owner der Datenbank und hat volle Rechte darauf.  
+> Deshalb verwenden wir **nicht** den Standard-`postgres` Superuser für die Applikation.
 
 ### 1c – Datenbankmodell implementieren
 - Tabellen gemäss UML-Modell erstellen
@@ -67,6 +76,24 @@ Die Zahlungslogik ist bewusst komplex gewählt und ist das fachliche Herzstück 
   - Bestellung die älter als 3 Monate ist
   - Stornierte Bestellung
   - Kunde der gesperrt ist (offener Saldo > 3 Monate)
+
+### 1e – SQL Queries
+SQL-Script mit Queries, die alle Geschäftsfälle abdecken und beweisen, dass Schema und Testdaten korrekt sind.
+
+**Ausweis-Queries:**
+1. Alle Kunden mit ihrem aktuellen Saldo (berechnet aus Zahlungen minus Bestellpositionen)
+2. Alle offenen Bestellungen eines Kunden mit Positionen und Gesamtbetrag
+3. Alle Kunden mit negativem Saldo (Zahlungen noch offen)
+4. Alle Kunden mit positivem Saldo (Guthaben vorhanden)
+5. Zahlungshistorie eines Kunden (alle Zahlungen chronologisch)
+
+**Geschäftslogik-Queries:**
+6. Alle Kunden die gesperrt sind (offener Saldo + letzte Bestellung älter als 3 Monate)
+7. Offene Bestellungen eines Kunden in FIFO-Reihenfolge (älteste zuerst) für die Verrechnung
+8. Alle stornierten Bestellungen
+9. Alle Bestellungen mit Status und Gesamtbetrag pro Bestellung
+
+> **Hinweis:** Die Queries werden als eigenständiges Script `db/queries.sql` abgelegt und können einzeln in `psql` ausgeführt werden.
 
 ---
 
@@ -209,21 +236,6 @@ Die Service-Schicht orchestriert die Business-Logik. Da die Zahlungslogik (FIFO-
 
 ---
 
-# Zeitplan (Orientierung)
-
-| Wochen | Inhalt |
-|--------|--------|
-| 1 | Domäne verstehen, Zahlungslogik durchdenken, UML-Modell erstellen |
-| 2–3 | PostgreSQL/Docker aufsetzen, SQL-Schema, Constraints, Testdaten → **Review 1** |
-| 4–5 | Spring Boot Projekt, Spring Data JDBC, Repository-Layer, Aggregate-Strukturen, Tests → **Review 2** |
-| 6–7 | Service-Layer, FIFO-Zahlungslogik, `@Transactional` & Rollback-Logik, Scheduler → **Review 3** |
-| 8 | REST-Layer, DTOs, Fehlerbehandlung, Testscripts → **Review 4** |
-| 9–10 | React UI Grundgerüst, Kundenliste, Kundendetail |
-| 11–12 | Bestelldetail, Polishing, End-to-End Tests → **Review 5** |
-| 13–14 | Dockerization: Dockerfiles, docker-compose.yml, End-to-End in Containern → **Review 6** |
-
----
-
 # Iteration 6 – Dockerization
 
 ## Concept
@@ -261,3 +273,17 @@ docker compose up -d
 - Verify all services start cleanly and communicate correctly
 - Document any environment variables in the README
 
+---
+
+# Zeitplan (Orientierung)
+
+| Wochen | Inhalt |
+|--------|--------|
+| 1 | Domäne verstehen, Zahlungslogik durchdenken, UML-Modell erstellen |
+| 2–3 | PostgreSQL/Docker aufsetzen, SQL-Schema, Constraints, Testdaten, SQL Queries → **Review 1** |
+| 4–5 | Spring Boot Projekt, Spring Data JDBC, Repository-Layer, Aggregate-Strukturen, Tests → **Review 2** |
+| 6–7 | Service-Layer, FIFO-Zahlungslogik, `@Transactional` & Rollback-Logik, Scheduler → **Review 3** |
+| 8 | REST-Layer, DTOs, Fehlerbehandlung, Testscripts → **Review 4** |
+| 9–10 | React UI Grundgerüst, Kundenliste, Kundendetail |
+| 11–12 | Bestelldetail, Polishing, End-to-End Tests → **Review 5** |
+| 13–14 | Dockerization: Dockerfiles, docker-compose.yml, End-to-End in Containern → **Review 6** |
