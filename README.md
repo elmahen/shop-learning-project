@@ -93,6 +93,27 @@ docker compose up -d
 
 ---
 
+## Database Admin Tools
+
+For browsing and inspecting the database beyond the command line:
+
+| Tool | Type | Notes |
+|------|------|-------|
+| [SQLTools](https://marketplace.visualstudio.com/items?itemName=mtxr.sqltools) + [PostgreSQL Driver](https://marketplace.visualstudio.com/items?itemName=mtxr.sqltools-driver-pg) | VS Code Extension | Recommended — stays inside VS Code, already in `.vscode/extensions.json` |
+| [TablePlus](https://tableplus.com/) | Desktop (Mac) | Clean native UI, free plan sufficient for this project |
+| [pgAdmin 4](https://www.pgadmin.org/) | Browser | The classic PostgreSQL admin tool, more heavyweight |
+
+**Connection settings** (all tools):
+```
+Host:     localhost
+Port:     5432
+Database: shopdb
+User:     shop_user
+Password: shop_pass
+```
+
+---
+
 ## Project Structure
 
 ```
@@ -105,6 +126,7 @@ shop-project/
 ├── db/
 │   ├── schema.sql                           # Table definitions & constraints
 │   ├── testdata.sql                         # Test data
+│   ├── queries.sql                          # Business case verification queries
 │   ├── psql.sh                              # Open interactive psql session
 │   ├── schema.sh                            # Load schema
 │   ├── testdata.sh                          # Load test data
@@ -190,7 +212,7 @@ A reference example covering all key UML constructs is provided at:
 
 | Iteration | Branch | Content | Status |
 |-----------|--------|---------|--------|
-| 1 | `iteration/01-pure-sql` | UML · PostgreSQL · Schema · Test data | ⬜ |
+| 1 | `iteration/01-pure-sql` | UML · PostgreSQL · Schema · Test data · SQL Queries | ⬜ |
 | 2 | `iteration/02-data-access` | Spring Boot · Spring Data JDBC · Repositories · Tests | ⬜ |
 | 3 | `iteration/03-service-layer` | Services · Payment logic · @Transactional · Scheduler | ⬜ |
 | 4 | `iteration/04-rest-api` | REST Controllers · DTOs · Error handling · Bruno tests | ⬜ |
