@@ -2,7 +2,7 @@
 # ─────────────────────────────────────────
 # testdata.sh – Testdaten laden
 # Voraussetzung: Schema ist bereits geladen
-# Usage: ./db/testdata.sh
+# Usage: ./testdata.sh
 # ─────────────────────────────────────────
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
