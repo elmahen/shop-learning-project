@@ -3,7 +3,7 @@
 # reset.sh – DB komplett zurücksetzen
 # Drop → Schema → Testdaten
 # Voraussetzung: shop_db Container läuft
-# Usage: ./db/reset.sh
+# Usage: ./reset.sh
 # ─────────────────────────────────────────
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
