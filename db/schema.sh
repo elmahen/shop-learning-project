@@ -2,7 +2,7 @@
 # ─────────────────────────────────────────
 # schema.sh – Datenbankschema laden
 # Voraussetzung: shop_db Container läuft
-# Usage: ./db/schema.sh
+# Usage: ./schema.sh
 # ─────────────────────────────────────────
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

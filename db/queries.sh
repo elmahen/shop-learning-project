@@ -1,12 +1,9 @@
 #!/bin/bash
 # ─────────────────────────────────────────
-# testdata.sh – Testdaten laden
-# Voraussetzung: Schema ist bereits geladen
-# Usage: ./testdata.sh
+# queries.sh – Business case queries ausführen
+# Usage: ./queries.sh
 # ─────────────────────────────────────────
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "→ Testdaten laden..."
-docker exec -i shop_db psql -U shop_user -d shopdb < "$SCRIPT_DIR/testdata.sql"
-echo "✓ Testdaten geladen"
+docker exec -i shop_db psql -U shop_user -d shopdb < "$SCRIPT_DIR/queries.sql"

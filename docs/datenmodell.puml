@@ -1,7 +1,9 @@
 @startuml Order_ER
 
 enum OrderStatus {
+  PENDING  
   PLACED
+  PAID
   CANCELLED
 }
 
