@@ -1,4 +1,4 @@
-CREATE TABLE customer (
+CREATE TABLE IF NOT EXISTS customer (
     id         BIGINT GENERATED ALWAYS AS IDENTITY,
     first_name VARCHAR(100)        NOT NULL,
     last_name  VARCHAR(100)        NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE customer (
     CONSTRAINT uq_customer_email UNIQUE (email)
 );
 
-CREATE TABLE orders (
+CREATE TABLE IF NOT EXISTS orders (
     id           BIGINT         GENERATED ALWAYS AS IDENTITY,
     order_status varchar(16)    NOT NULL check (order_status in ('PENDING','PLACED', 'PAID', 'CANCELLED')),
     order_date   TIMESTAMP      NOT NULL DEFAULT NOW(),
@@ -21,7 +21,7 @@ CREATE TABLE orders (
     CONSTRAINT fk_order_customer FOREIGN KEY (customer_id) REFERENCES customer(id)
 );
 
-CREATE TABLE article (
+CREATE TABLE IF NOT EXISTS article (
     id                  BIGINT          GENERATED ALWAYS AS IDENTITY,
     article_name        VARCHAR(100)    NOT NULL,
     price               NUMERIC(10,2)   NOT NULL,
@@ -29,9 +29,9 @@ CREATE TABLE article (
     CONSTRAINT pk_article PRIMARY KEY (id)
 );
 
-CREATE TABLE order_positions (
+CREATE TABLE IF NOT EXISTS order_positions (
     id           BIGINT         GENERATED ALWAYS AS IDENTITY,
-    quantity     BIGINT         NOT NULL,
+    quantity BIGINT NOT NULL CHECK (quantity > 0),
     price        NUMERIC(10,2)  NOT NULL,
     order_id     BIGINT         NOT NULL,
     article_id   BIGINT         NOT NULL,
@@ -42,9 +42,9 @@ CREATE TABLE order_positions (
 );
 
 
-CREATE TABLE payment ( 
+CREATE TABLE IF NOT EXISTS payment ( 
     id          BIGINT    GENERATED ALWAYS AS IDENTITY,
-    amount      NUMERIC(10,2)    NOT NULL,
+    amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     date        TIMESTAMP NOT NULL DEFAULT NOW(),
     customer_id BIGINT NOT NULL,
 
