@@ -212,8 +212,9 @@ A reference example covering all key UML constructs is provided at:
 
 | Iteration | Branch | Content | Status |
 |-----------|--------|---------|--------|
-| 1 | `iteration/01-pure-sql` | UML · PostgreSQL · Schema · Test data · SQL Queries | ⬜ |
-| 2 | `iteration/02-data-access` | Spring Boot · Spring Data JDBC · Repositories · Tests | ⬜ |
+| 0 | `iteration/00-spike` | Spring Boot setup · React setup · Basic Customer CRUD (end-to-end) | ✓ |
+| 1 | `iteration/01-pure-sql` | UML · PostgreSQL · Schema · Test data · SQL Queries | ✓ |
+| 2 | `iteration/02-data-access` | Spring Boot · Spring Data JDBC · Repositories · Tests | ✓ |
 | 3 | `iteration/03-service-layer` | Services · Payment logic · @Transactional · Scheduler | ⬜ |
 | 4 | `iteration/04-rest-api` | REST Controllers · DTOs · Error handling · Bruno tests | ⬜ |
 | 5 | `iteration/05-react-ui` | React · Components · API integration | ⬜ |
