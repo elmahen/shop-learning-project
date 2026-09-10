@@ -9,5 +9,4 @@ public interface OrderRepository extends ListCrudRepository<Order, Long> {
 
     List<Order> findByCustomerIdOrderByOrderDateAsc(Long id);
 
-    
 }

@@ -1,11 +1,9 @@
 package com.example.shop.repository;
 
-
 import com.example.shop.domain.Customer;
 import com.example.shop.domain.Order;
 import com.example.shop.domain.OrderStatus;
 
-import lombok.val;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,44 +13,37 @@ import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabas
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowableOfType;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 
 @DataJdbcTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class OrderRepositoryTest {
 
-    @Autowired 
+    @Autowired
     private OrderRepository orderRepository;
 
-    @Autowired 
+    @Autowired
     private CustomerRepository customerRepository;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         jdbcTemplate.execute("DELETE FROM order_positions");
         jdbcTemplate.execute("DELETE FROM orders");
         jdbcTemplate.execute("DELETE FROM payment");
         jdbcTemplate.execute("DELETE FROM customer");
     }
 
-
     @Test
-    void shouldSaveAndFindOrder(){
+    void shouldSaveAndFindOrder() {
 
-        Customer customer = new Customer("Lena","Müller", "lena.müller@gmail.com");
+        Customer customer = new Customer("Lena", "Müller", "lena.müller@gmail.com");
 
         Customer saved = customerRepository.save(customer);
 
-        
         Order order = new Order(saved.getId(), OrderStatus.PENDING);
 
         Order placed = orderRepository.save(order);
@@ -63,9 +54,9 @@ public class OrderRepositoryTest {
         assertThat(placed.getCustomerId()).isEqualTo(customer.getId());
     }
 
-    @Test 
-    void shouldFindByCustomerId(){
-        Customer customer = new Customer("Lena","Müller", "lena.müller@gmail.com");
+    @Test
+    void shouldFindByCustomerId() {
+        Customer customer = new Customer("Lena", "Müller", "lena.müller@gmail.com");
 
         Customer saved = customerRepository.save(customer);
 
@@ -79,17 +70,16 @@ public class OrderRepositoryTest {
 
     }
 
-
-    @Test 
-    void shouldReturnEmptyWhenNoOrders(){
+    @Test
+    void shouldReturnEmptyWhenNoOrders() {
         List<Order> found = orderRepository.findByCustomerIdOrderByOrderDateAsc(123L);
-    assertThat(found).isEmpty();
+        assertThat(found).isEmpty();
     }
 
-    @Test 
-    void shouldDeleteOrder(){
+    @Test
+    void shouldDeleteOrder() {
 
-        Customer customer = new Customer("Lena","Müller", "lena.müller@gmail.com");
+        Customer customer = new Customer("Lena", "Müller", "lena.müller@gmail.com");
 
         Customer saved = customerRepository.save(customer);
 
@@ -101,5 +91,5 @@ public class OrderRepositoryTest {
 
         assertThat(orderRepository.findById(placed.getId())).isEmpty();
     }
-    
+
 }

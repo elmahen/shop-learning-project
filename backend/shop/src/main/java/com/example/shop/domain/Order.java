@@ -8,15 +8,14 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("orders")
 public class Order {
 
-    @Id 
+    @Id
     private Long id;
     private OrderStatus orderStatus;
     private LocalDateTime orderDate;
     private Long customerId;
 
-
-    public Order(){}
-
+    public Order() {
+    }
 
     public Order(Long customerId, OrderStatus orderStatus) {
         this.customerId = customerId;
@@ -24,18 +23,37 @@ public class Order {
         this.orderDate = LocalDateTime.now();
     }
 
+    public Long getId() {
+        return id;
+    }
 
-    public Long getId()                 {return id;}
-    public OrderStatus getOrderStatus() { return orderStatus;}
-    public LocalDateTime getOrderDate() { return orderDate;}
-    public Long getCustomerId() {return customerId;}
+    public OrderStatus getOrderStatus() {
+        return orderStatus;
+    }
 
+    public LocalDateTime getOrderDate() {
+        return orderDate;
+    }
 
-    public void setId(Long id) {this.id = id;}
-    public void setOrderStatus(OrderStatus orderStatus) {this.orderStatus = orderStatus;}
-    public void setOrderDate(LocalDateTime orderDate) {this.orderDate = orderDate;}
-    public void setCustomerId(Long customerId) {this.customerId = customerId;}
+    public Long getCustomerId() {
+        return customerId;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public void setOrderDate(LocalDateTime orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
+    }
 
     @Override
     public String toString() {
@@ -43,5 +61,4 @@ public class Order {
                 + customerId + "]";
     }
 
-    
 }
