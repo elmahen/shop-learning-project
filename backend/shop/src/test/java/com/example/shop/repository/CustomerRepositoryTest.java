@@ -28,7 +28,7 @@ class CustomerRepositoryTest {
     private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         jdbcTemplate.execute("DELETE FROM order_positions");
         jdbcTemplate.execute("DELETE FROM orders");
         jdbcTemplate.execute("DELETE FROM payment");
@@ -36,8 +36,8 @@ class CustomerRepositoryTest {
     }
 
     @Test
-    void shouldSaveAndFindCustomer(){
-        Customer customer = new Customer("Lena","Müller", "lena.müller@gmail.com");
+    void shouldSaveAndFindCustomer() {
+        Customer customer = new Customer("Lena", "Müller", "lena.müller@gmail.com");
 
         Customer saved = customerRepository.save(customer);
 
@@ -57,9 +57,8 @@ class CustomerRepositoryTest {
         assertEquals(found.get().getFirstName(), "Anna");
     }
 
-
     @Test
-    void shouldReturnEmptyWhenEmailNotFound(){
+    void shouldReturnEmptyWhenEmailNotFound() {
 
         Optional<Customer> found = customerRepository.findByEmail("nicht@vorhanden.com");
 
@@ -70,27 +69,25 @@ class CustomerRepositoryTest {
     void shouldEnforceUniqueEmail() {
         customerRepository.save(new Customer("Anna", "Müller", "anna@example.com"));
 
-        
         assertThrows(Exception.class, () -> {
             customerRepository.save(new Customer("Bob", "Smith", "anna@example.com"));
         });
     }
 
     @Test
-    void shouldFindAllCustomers(){
+    void shouldFindAllCustomers() {
 
         customerRepository.save(new Customer("Anna", "Müller", "anna@example.com"));
         customerRepository.save(new Customer("Bob", "Smith", "bob@example.com"));
 
         var customers = customerRepository.findAll();
 
-
         assertThat(customers).hasSize(2);
     }
 
     @Test
     void shouldDeleteCustomer() {
-     
+
         Customer saved = customerRepository.save(new Customer("Anna", "Müller", "anna@example.com"));
 
         customerRepository.deleteById(saved.getId());
