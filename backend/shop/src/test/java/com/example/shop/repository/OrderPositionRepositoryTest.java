@@ -34,8 +34,6 @@ public class OrderPositionRepositoryTest {
     @Autowired
     private ArticleRepository articleRepository;
 
-    @Autowired
-    private PaymentRepository paymentRepository;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -64,7 +62,8 @@ public class OrderPositionRepositoryTest {
     OrderPosition orderPosition = new OrderPosition(1, created.getPrice(), placed.getId(), created.getId());
     OrderPosition savedOP = orderPositionRepository.save(orderPosition);
 
-    assertThat(savedOP.getId()).isNotNull();assertThat(savedOP.getQuantity()).isEqualTo(1);
+    assertThat(savedOP.getId()).isNotNull();
+    assertThat(savedOP.getQuantity()).isEqualTo(1);
     assertThat(savedOP.getPrice()).isEqualTo(new BigDecimal("5.00"));
     assertThat(savedOP.getOrderId()).isEqualTo(placed.getId());
     assertThat(savedOP.getArticleId()).isEqualTo(created.getId());
