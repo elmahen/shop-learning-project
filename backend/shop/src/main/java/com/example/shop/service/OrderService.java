@@ -3,8 +3,10 @@ package com.example.shop.service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.shop.domain.Article;
 import com.example.shop.domain.Order;
@@ -23,22 +25,19 @@ import com.example.shop.repository.OrderRepository;
 import com.example.shop.repository.PaymentRepository;
 
 @Service
-
 public class OrderService {
 
     private final OrderRepository orderRepository;
-
     private final OrderPositionRepository orderPositionRepository;
-
     private final ArticleRepository articleRepository;
-
     private final CustomerRepository customerRepository;
-
     private final PaymentRepository paymentRepository;
 
-    public OrderService(OrderRepository orderRepository, OrderPositionRepository orderPositionRepository,
-            ArticleRepository articleRepository, CustomerRepository customerRepository,
-            PaymentRepository paymentRepository) {
+    public OrderService(OrderRepository orderRepository,
+                        OrderPositionRepository orderPositionRepository,
+                        ArticleRepository articleRepository,
+                        CustomerRepository customerRepository,
+                        PaymentRepository paymentRepository) {
         this.orderRepository = orderRepository;
         this.orderPositionRepository = orderPositionRepository;
         this.articleRepository = articleRepository;
@@ -52,7 +51,6 @@ public class OrderService {
 
         Order order = new Order(customerId, OrderStatus.PENDING);
         return orderRepository.save(order);
-
     }
 
     public OrderPosition addItemToOrder(Long orderId, Long articleId, int quantity) {
@@ -67,7 +65,6 @@ public class OrderService {
                 .orElseThrow(() -> new ArticleNotFoundException("Artikel existiert nicht"));
 
         OrderPosition orderPosition = new OrderPosition(quantity, article.getPrice(), orderId, articleId);
-
         return orderPositionRepository.save(orderPosition);
     }
 
@@ -91,11 +88,10 @@ public class OrderService {
         }
 
         order.setOrderStatus(OrderStatus.CANCELLED);
-
         return orderRepository.save(order);
-
     }
 
+    @Transactional
     public Order placeOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Bestellung nicht gefunden"));
@@ -104,40 +100,42 @@ public class OrderService {
             throw new OrderNotModifiableException("Bestellung kann nicht mehr bearbeitet werden");
         }
 
-        List<Payment> payments = paymentRepository.findByCustomerIdOrderByDateAsc(order.getCustomerId());
+        Long customerId = order.getCustomerId();
 
+        List<Payment> payments = paymentRepository.findByCustomerIdOrderByDateAsc(customerId);
         BigDecimal totalPaid = payments.stream()
                 .map(Payment::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        List<Order> orders = orderRepository.findByCustomerIdOrderByOrderDateAsc(order.getCustomerId());
+        List<Order> orders = orderRepository.findByCustomerIdOrderByOrderDateAsc(customerId);
 
         BigDecimal totalOrdered = orders.stream()
+                .filter(o -> o.getOrderStatus() != OrderStatus.CANCELLED)
                 .flatMap(o -> orderPositionRepository.findByOrderId(o.getId()).stream())
                 .map(op -> op.getPrice().multiply(new BigDecimal(op.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal saldo = totalPaid.subtract(totalOrdered);
 
-        Order lastOrder = orders.get(orders.size() - 1);
-        LocalDateTime threeMonthsAgo = LocalDateTime.now().minusMonths(3);
+        List<Order> previousPlacedOrders = orders.stream()
+                .filter(o -> !Objects.equals(o.getId(), orderId))
+                .filter(o -> o.getOrderStatus() == OrderStatus.PLACED || o.getOrderStatus() == OrderStatus.PAID)
+                .toList();
 
-        if (saldo.compareTo(BigDecimal.ZERO) < 0 && lastOrder.getOrderDate().isBefore(threeMonthsAgo)) {
-            throw new CustomerBlockedException("Kunde ist gesperrt wegen offenem Saldo");
+        if (saldo.compareTo(BigDecimal.ZERO) < 0 && !previousPlacedOrders.isEmpty()) {
+            Order lastPlacedOrder = previousPlacedOrders.get(previousPlacedOrders.size() - 1);
+            LocalDateTime threeMonthsAgo = LocalDateTime.now().minusMonths(3);
+
+            if (lastPlacedOrder.getOrderDate().isBefore(threeMonthsAgo)) {
+                throw new CustomerBlockedException("Kunde ist gesperrt wegen offenem Saldo");
+            }
         }
-
         order.setOrderStatus(OrderStatus.PLACED);
-
         return orderRepository.save(order);
-
     }
 
     public Order getOrder(Long orderId) {
-        Order order = orderRepository.findById(orderId)
+        return orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Bestellung nicht gefunden"));
-
-        return order;
-
     }
-
 }

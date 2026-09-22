@@ -17,6 +17,7 @@ import com.example.shop.repository.CustomerRepository;
 import com.example.shop.repository.OrderPositionRepository;
 import com.example.shop.repository.OrderRepository;
 import com.example.shop.repository.PaymentRepository;
+import com.example.shop.domain.Order;
 
 @Service 
 public class PaymentService {
