@@ -3,7 +3,6 @@ package com.example.shop.service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,10 +33,10 @@ public class OrderService {
     private final PaymentRepository paymentRepository;
 
     public OrderService(OrderRepository orderRepository,
-                        OrderPositionRepository orderPositionRepository,
-                        ArticleRepository articleRepository,
-                        CustomerRepository customerRepository,
-                        PaymentRepository paymentRepository) {
+            OrderPositionRepository orderPositionRepository,
+            ArticleRepository articleRepository,
+            CustomerRepository customerRepository,
+            PaymentRepository paymentRepository) {
         this.orderRepository = orderRepository;
         this.orderPositionRepository = orderPositionRepository;
         this.articleRepository = articleRepository;
@@ -117,19 +116,13 @@ public class OrderService {
 
         BigDecimal saldo = totalPaid.subtract(totalOrdered);
 
-        List<Order> previousPlacedOrders = orders.stream()
-                .filter(o -> !Objects.equals(o.getId(), orderId))
-                .filter(o -> o.getOrderStatus() == OrderStatus.PLACED || o.getOrderStatus() == OrderStatus.PAID)
-                .toList();
+        Order lastOrder = orders.get(orders.size() - 1);
+        LocalDateTime threeMonthsAgo = LocalDateTime.now().minusMonths(3);
 
-        if (saldo.compareTo(BigDecimal.ZERO) < 0 && !previousPlacedOrders.isEmpty()) {
-            Order lastPlacedOrder = previousPlacedOrders.get(previousPlacedOrders.size() - 1);
-            LocalDateTime threeMonthsAgo = LocalDateTime.now().minusMonths(3);
-
-            if (lastPlacedOrder.getOrderDate().isBefore(threeMonthsAgo)) {
-                throw new CustomerBlockedException("Kunde ist gesperrt wegen offenem Saldo");
-            }
+        if (saldo.compareTo(BigDecimal.ZERO) < 0 && lastOrder.getOrderDate().isBefore(threeMonthsAgo)) {
+            throw new CustomerBlockedException("Kunde ist gesperrt wegen offenem Saldo");
         }
+        
         order.setOrderStatus(OrderStatus.PLACED);
         return orderRepository.save(order);
     }
