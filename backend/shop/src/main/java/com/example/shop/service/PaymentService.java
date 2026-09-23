@@ -1,7 +1,5 @@
 package com.example.shop.service;
 
-
-
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -19,10 +17,10 @@ import com.example.shop.repository.OrderRepository;
 import com.example.shop.repository.PaymentRepository;
 import com.example.shop.domain.Order;
 
-@Service 
+@Service
 public class PaymentService {
 
-     private final OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
 
     private final OrderPositionRepository orderPositionRepository;
 
@@ -30,15 +28,13 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
 
-
-    public PaymentService(OrderRepository orderRepository, OrderPositionRepository orderPositionRepository, CustomerRepository customerRepository, PaymentRepository paymentRepository){
+    public PaymentService(OrderRepository orderRepository, OrderPositionRepository orderPositionRepository,
+            CustomerRepository customerRepository, PaymentRepository paymentRepository) {
         this.orderRepository = orderRepository;
         this.orderPositionRepository = orderPositionRepository;
         this.customerRepository = customerRepository;
         this.paymentRepository = paymentRepository;
     }
-
-
 
     @Transactional
     public Payment processPayment(Long customerId, BigDecimal amount) {
@@ -62,7 +58,7 @@ public class PaymentService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         for (Order order : orders) {
-            if (order.getOrderStatus() == OrderStatus.CANCELLED || order.getOrderStatus() == OrderStatus.PENDING) {
+            if (order.getOrderStatus() != OrderStatus.PLACED) {
                 continue;
             }
 
@@ -88,7 +84,4 @@ public class PaymentService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-
-  
 }
-
