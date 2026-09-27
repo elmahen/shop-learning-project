@@ -8,7 +8,6 @@ import com.example.shop.domain.Article;
 import com.example.shop.repository.ArticleRepository;
 
 @Service 
-
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
