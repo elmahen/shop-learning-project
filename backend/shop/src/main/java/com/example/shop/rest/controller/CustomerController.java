@@ -22,12 +22,11 @@ public class CustomerController {
 
     @PostMapping
     public ResponseEntity<CustomerResponse> createCustomer(@RequestBody CreateCustomerRequest request) {
-            var customer = customerService.createCustomer(
+        var customer = customerService.createCustomer(
                 request.getFirstName(),
                 request.getLastName(),
-                request.getEmail()
-            );
-            return ResponseEntity
+                request.getEmail());
+        return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(CustomerResponse.from(customer));
     }
@@ -35,8 +34,14 @@ public class CustomerController {
     @GetMapping
     public List<CustomerResponse> getAllCustomers() {
         return customerService.getAllCustomers()
-            .stream()
-            .map(CustomerResponse::from)
-            .toList();
+                .stream()
+                .map(CustomerResponse::from)
+                .toList();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CustomerResponse> getCustomerById(@PathVariable Long id) {
+        var customer = customerService.getCustomerById(id);
+        return ResponseEntity.ok(CustomerResponse.from(customer));
     }
 }
