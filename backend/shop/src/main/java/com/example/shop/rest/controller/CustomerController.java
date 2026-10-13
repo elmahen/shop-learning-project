@@ -1,6 +1,5 @@
 package com.example.shop.rest.controller;
 
-import com.example.shop.exception.CustomerAlreadyExistsException;
 import com.example.shop.rest.dto.CreateCustomerRequest;
 import com.example.shop.rest.dto.CustomerResponse;
 import com.example.shop.service.CustomerService;
@@ -22,8 +21,7 @@ public class CustomerController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createCustomer(@RequestBody CreateCustomerRequest request) {
-        try {
+    public ResponseEntity<CustomerResponse> createCustomer(@RequestBody CreateCustomerRequest request) {
             var customer = customerService.createCustomer(
                 request.getFirstName(),
                 request.getLastName(),
@@ -32,11 +30,6 @@ public class CustomerController {
             return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(CustomerResponse.from(customer));
-        } catch (CustomerAlreadyExistsException e) {
-            return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(e.getMessage());
-        }
     }
 
     @GetMapping
