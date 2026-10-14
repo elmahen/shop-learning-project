@@ -1,6 +1,5 @@
 package com.example.shop.rest.controller;
 
-import com.example.shop.exception.CustomerAlreadyExistsException;
 import com.example.shop.rest.dto.CreateCustomerRequest;
 import com.example.shop.rest.dto.CustomerResponse;
 import com.example.shop.service.CustomerService;
@@ -22,28 +21,27 @@ public class CustomerController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createCustomer(@RequestBody CreateCustomerRequest request) {
-        try {
-            var customer = customerService.createCustomer(
+    public ResponseEntity<CustomerResponse> createCustomer(@RequestBody CreateCustomerRequest request) {
+        var customer = customerService.createCustomer(
                 request.getFirstName(),
                 request.getLastName(),
-                request.getEmail()
-            );
-            return ResponseEntity
+                request.getEmail());
+        return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(CustomerResponse.from(customer));
-        } catch (CustomerAlreadyExistsException e) {
-            return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(e.getMessage());
-        }
     }
 
     @GetMapping
     public List<CustomerResponse> getAllCustomers() {
         return customerService.getAllCustomers()
-            .stream()
-            .map(CustomerResponse::from)
-            .toList();
+                .stream()
+                .map(CustomerResponse::from)
+                .toList();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CustomerResponse> getCustomerById(@PathVariable Long id) {
+        var customer = customerService.getCustomerById(id);
+        return ResponseEntity.ok(CustomerResponse.from(customer));
     }
 }

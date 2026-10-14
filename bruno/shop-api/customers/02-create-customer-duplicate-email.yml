@@ -1,0 +1,29 @@
+info:
+  name: Create Customer - duplicate email
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{baseUrl}}/customers"
+  body:
+    type: json
+    data: |-
+      {
+        "firstName": "Anna",
+        "lastName": "Muster",
+        "email": "{{customerEmail}}"
+      }
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status ist 409 Conflict", () => {
+          expect(res.getStatus()).to.equal(409);
+        });
+
+docs: |-
+  Fehlerfall: Die E-Mail aus "Create Customer" existiert schon → 409 Conflict.
+
+  Muss nach "Create Customer" laufen (braucht `customerEmail`).

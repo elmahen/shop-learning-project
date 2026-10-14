@@ -1,0 +1,28 @@
+info:
+  name: Get All Customers
+  type: http
+  seq: 5
+
+http:
+  method: GET
+  url: "{{baseUrl}}/customers"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status ist 200 OK", () => {
+          expect(res.getStatus()).to.equal(200);
+        });
+
+        test("Liefert eine Liste", () => {
+          expect(res.getBody()).to.be.an("array").that.is.not.empty;
+        });
+
+        test("Liste enthält den zuvor angelegten Kunden", () => {
+          const ids = res.getBody().map((c) => c.id);
+          expect(ids).to.include(bru.getVar("customerId"));
+        });
+
+docs: |-
+  Lädt alle Kunden (Happy Path) und prüft, dass der Kunde aus "Create Customer" dabei ist.
