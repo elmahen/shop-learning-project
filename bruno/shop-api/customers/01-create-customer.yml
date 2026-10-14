@@ -1,0 +1,46 @@
+info:
+  name: Create Customer
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/customers"
+  body:
+    type: json
+    data: |-
+      {
+        "firstName": "Anna",
+        "lastName": "Muster",
+        "email": "{{customerEmail}}"
+      }
+
+runtime:
+  scripts:
+    - type: before-request
+      code: |-
+        // Eindeutige E-Mail pro Lauf, damit der Test beliebig oft laufen kann
+        bru.setVar("customerEmail", `anna.muster+${Date.now()}@example.com`);
+    - type: after-response
+      code: |-
+        // ID für die nachfolgenden Requests merken
+        bru.setVar("customerId", res.body.id);
+    - type: tests
+      code: |-
+        test("Status ist 201 Created", () => {
+          expect(res.getStatus()).to.equal(201);
+        });
+
+        test("Antwort enthält den neuen Kunden", () => {
+          const body = res.getBody();
+          expect(body.id).to.be.a("number");
+          expect(body.firstName).to.equal("Anna");
+          expect(body.lastName).to.equal("Muster");
+          expect(body.email).to.equal(bru.getVar("customerEmail"));
+        });
+
+docs: |-
+  Legt einen neuen Kunden an (Happy Path).
+
+  - Erzeugt pro Lauf eine eindeutige E-Mail und speichert sie in `customerEmail`.
+  - Speichert die ID des neuen Kunden in `customerId` für die folgenden Requests.

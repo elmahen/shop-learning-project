@@ -1,0 +1,19 @@
+info:
+  name: Get Customer by Id - not found
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{baseUrl}}/customers/999999999"
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Status ist 404 Not Found", () => {
+          expect(res.getStatus()).to.equal(404);
+        });
+
+docs: |-
+  Fehlerfall: Eine ID, die es nicht gibt → 404 Not Found.

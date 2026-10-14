@@ -48,7 +48,7 @@ public class OrderController {
         var order = orderService.cancelOrder(id);
         return ResponseEntity.ok(OrderResponse.from(order));
     }
-
+    
     @PostMapping("/{id}/place")
     public ResponseEntity<OrderResponse> placeOrder(@PathVariable Long id) {
         var order = orderService.placeOrder(id);
